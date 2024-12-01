@@ -115,6 +115,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - your.email@example.com
+Your Name - oliverwafula2020@gmail.com
 
-Project Link: [https://github.com/yourusername/spree_shop](https://github.com/yourusername/spree_shop)
+Project Link: [https://github.com/yourusername/spree_shop](https://github.com/oliversimiyu/spree_shop)
