@@ -35,7 +35,7 @@ This Django-based e-commerce application provides a comprehensive online shoppin
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/spree_shop.git
+git clone https://github.com/oliversimiyu/spree_shop.git
 cd spree_shop
 ```
 
