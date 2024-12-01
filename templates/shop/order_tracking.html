@@ -1,0 +1,59 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Order Tracking{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Order #{{ order.id }} Tracking</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Order Details</h4>
+                    <table class="table">
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span class="badge {{ order.get_status_display_class }}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Tracking Number</th>
+                            <td>{{ order.tracking_number|default:"Not available" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estimated Delivery</th>
+                            <td>{{ order.estimated_delivery|default:"Not available" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h4>Order Items</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

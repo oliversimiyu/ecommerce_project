@@ -1,0 +1,80 @@
+{% extends 'shop/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}All Products{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Filter Products</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        {{ filter_form|crispy }}
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Categories</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for cat in categories %}
+                    <li class="list-group-item">
+                        <a href="{% url 'shop:product_list_by_category' cat.slug %}">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="row">
+                {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.category.name }}</p>
+                            <p class="card-text text-primary">${{ product.price }}</p>
+                            <div class="mb-2">
+                                {% with rating=product.average_rating %}
+                                    {% for i in "12345" %}
+                                        <span class="text-warning">
+                                            {% if i <= rating|stringformat:"i" %}★{% else %}☆{% endif %}
+                                        </span>
+                                    {% endfor %}
+                                    ({{ rating|floatformat:1 }}/5.0)
+                                {% endwith %}
+                            </div>
+                            <a href="{% url 'shop:product_detail' product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            <form method="post" action="{% url 'shop:cart_add' product.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No products found. Try adjusting your filters.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

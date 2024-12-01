@@ -1,0 +1,132 @@
+{% extends 'shop/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="No image available">
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted">Category: {{ product.category.name }}</p>
+            
+            <div class="mb-3">
+                <h3 class="text-primary">${{ product.price }}</h3>
+                {% if product.stock > 0 %}
+                <span class="badge bg-success">In Stock ({{ product.stock }} available)</span>
+                {% else %}
+                <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4">
+                <h4>Description</h4>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+            
+            {% if user.is_authenticated and product.stock > 0 %}
+            <form action="{% url 'shop:cart_add' product.id %}" method="post" class="mb-3">
+                {% csrf_token %}
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="quantity" class="col-form-label">Quantity:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" id="quantity" name="quantity" class="form-control" 
+                               value="1" min="1" max="{{ product.stock }}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% elif not user.is_authenticated %}
+            <div class="alert alert-info">
+                Please <a href="{% url 'login' %}">login</a> to add items to your cart.
+            </div>
+            {% endif %}
+            
+            <div class="mt-4">
+                <h4>Product Details</h4>
+                <ul class="list-unstyled">
+                    <li><strong>SKU:</strong> {{ product.id }}</li>
+                    <li><strong>Added:</strong> {{ product.created|date:"F j, Y" }}</li>
+                    <li><strong>Last Updated:</strong> {{ product.updated|date:"F j, Y" }}</li>
+                </ul>
+            </div>
+            
+            <div class="mb-3">
+                <strong>Average Rating:</strong> 
+                {% with rating=product.average_rating %}
+                    {% for i in "12345" %}
+                        <span class="text-warning">
+                            {% if i <= rating|stringformat:"i" %}★{% else %}☆{% endif %}
+                        </span>
+                    {% endfor %}
+                    ({{ rating|floatformat:1 }}/5.0)
+                {% endwith %}
+            </div>
+            
+            {% if user.is_authenticated %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Write a Review</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ review_form|crispy }}
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Please <a href="{% url 'login' %}">login</a> to write a review.
+            </div>
+            {% endif %}
+
+            <div class="reviews">
+                {% for review in reviews %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="card-subtitle mb-2 text-muted">{{ review.user.username }}</h6>
+                            <small class="text-muted">{{ review.created_at|date:"F d, Y" }}</small>
+                        </div>
+                        <div class="mb-2">
+                            {% for i in "12345" %}
+                                <span class="text-warning">
+                                    {% if i <= review.rating|stringformat:"i" %}★{% else %}☆{% endif %}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">{{ review.comment }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No reviews yet. Be the first to review this product!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

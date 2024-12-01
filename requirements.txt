@@ -1,0 +1,9 @@
+Django==5.0.1
+Pillow==10.2.0
+stripe==7.10.0
+python-dotenv==1.0.0
+django-crispy-forms==2.1
+crispy-bootstrap5==2024.1
+django-taggit==5.0.1
+django-filter==23.5
+requests==2.31.0
